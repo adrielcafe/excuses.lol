@@ -82,6 +82,7 @@ web_modules/
 .parcel-cache
 
 # Vite build output
+dist
 dist-ssr
 
 # SvelteKit build / generate output

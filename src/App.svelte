@@ -1,7 +1,6 @@
 <script lang="ts">
   import { t, locale } from 'svelte-i18n';
   import { writable, get } from 'svelte/store';
-  import { onMount } from 'svelte';
   import flagUsUrl from './assets/flag_us.svg';
   import flagBrUrl from './assets/flag_br.svg';
   import flagEsUrl from './assets/flag_es.svg';

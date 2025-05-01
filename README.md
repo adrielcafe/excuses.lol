@@ -34,3 +34,7 @@ To generate the static site files (for deployment on platforms like GitHub Pages
     ```bash
     npm run preview
     ```
+
+## Deployment to GitHub Pages
+
+`git subtree push --prefix dist origin gh-pages`
