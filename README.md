@@ -37,4 +37,6 @@ To generate the static site files (for deployment on platforms like GitHub Pages
 
 ## Deployment to GitHub Pages
 
-`git subtree push --prefix dist origin gh-pages`
+```bash
+npm run publish
+```

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && cp ads.txt dist/ads.txt",
     "preview": "vite preview",
+    "publish": "gh-pages -d dist --cname excuses.lol",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
@@ -18,6 +19,7 @@
     "vite": "^6.3.1"
   },
   "dependencies": {
+    "gh-pages": "^6.3.0",
     "svelte-i18n": "^4.0.1"
   }
 }

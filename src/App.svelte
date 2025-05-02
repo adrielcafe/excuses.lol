@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t, locale } from 'svelte-i18n';
+  import { t, locale, json } from 'svelte-i18n';
   import { writable, get } from 'svelte/store';
   import flagUsUrl from './assets/flag_us.svg';
   import flagBrUrl from './assets/flag_br.svg';
@@ -8,6 +8,12 @@
   import flagZhUrl from './assets/flag_zh.svg';
   import reloadIconUrl from './assets/icon_reload.svg';
   import copyIconUrl from './assets/icon_copy.svg';
+
+  declare global {
+    interface Window {
+      gtag?: (...args: any[]) => void;
+    }
+  }
 
   const supportedLocales = ['en', 'pt', 'es', 'fr', 'zh'];
 
@@ -47,21 +53,21 @@
   let reloadClicked = false;
   let showCopyConfirmation = writable(false);
 
+  function changeLocale(newLocale: string) {
+    locale.set(newLocale);
+  }
+
   function initializeLocale() {
     if (typeof navigator !== 'undefined' && navigator.language) {
       const browserLang = navigator.language.split('-')[0];
       if (supportedLocales.includes(browserLang)) {
-        locale.set(browserLang);
+        changeLocale(browserLang);
       } else {
-        locale.set('en');
+        changeLocale('en');
       }
     } else {
-      locale.set('en');
+      changeLocale('en');
     }
-  }
-
-  function changeLocale(newLocale: string) {
-    locale.set(newLocale);
   }
 
   function getRandomElement<T>(arr: T[]): T {
@@ -69,53 +75,41 @@
   }
 
   async function updateContent() {
-    let lang = get(locale);
-    if (!lang || !supportedLocales.includes(lang)) {
-      lang = 'en';
-      if (get(locale) !== 'en') locale.set('en');
-    }
+    const phrases = $t('phrases') as unknown as string[];
+    let newPhrase = getRandomElement(phrases);
+    currentPhrase.set(newPhrase);
 
-    try {
-      const langModule = await import(`./i18n/${lang}.json`);
-      const phrasesForLang = langModule.phrases;
-
-      if (phrasesForLang && phrasesForLang.length > 0) {
-          currentPhrase.set(getRandomElement(phrasesForLang));
-      } else {
-          const fallbackModule = await import('./i18n/en.json');
-          currentPhrase.set(getRandomElement(fallbackModule.phrases));
-      }
-    } catch (error) {
-      console.error(`Failed to load language file for ${lang}:`, error);
-      try {
-        const fallbackModule = await import('./i18n/en.json');
-        currentPhrase.set(getRandomElement(fallbackModule.phrases));
-      } catch (fallbackError) {
-        console.error('Failed to load fallback English language file:', fallbackError);
-        currentPhrase.set("Oops, something went wrong loading excuses!");
-      }
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'load_new_excuse', {
+        'event_category': 'engagement',
+        'event_label': get(locale).split('-')[0],
+        'value': 1
+      });
     }
 
     const newBgColor = getRandomElement(colors);
     currentBgColor.set(newBgColor);
 
+    if (typeof document !== 'undefined') {
+      document.body.style.backgroundColor = newBgColor;
+    }
+
     reloadClicked = true;
     setTimeout(() => reloadClicked = false, 300);
   }
-  
-  initializeLocale();
-
-  locale.subscribe((newLocale) => {
-    if (newLocale) {
-        updateContent();
-    }
-  });
 
   async function copyToClipboard() {
     const textToCopy = get(currentPhrase);
     if (textToCopy && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(textToCopy);
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'copy_excuse', {
+            'event_category': 'engagement',
+            'event_label': textToCopy,
+            'value': 1
+          });
+        }
         showCopyConfirmation.set(true);
         setTimeout(() => showCopyConfirmation.set(false), 2000);
       } catch (err) {
@@ -123,6 +117,14 @@
       }
     }
   }
+
+  initializeLocale();
+
+  locale.subscribe((newLocale) => {
+    if (newLocale) {
+        updateContent();
+    }
+  });
 </script>
 
 <main
@@ -259,12 +261,12 @@
     min-height: 100vh;
     color: var(--text-color-dark);
     text-align: center;
-    padding: var(--spacing-lg);
     transition: background-color var(--transition-duration-long);
   }
 
   .flags-container {
     width: 100%;
+    margin-top: var(--spacing-sm);
   }
 
   .flags-inner-container {
@@ -398,10 +400,6 @@
       --spacing-md: 0.5rem;
       --spacing-lg: 0.7rem;
       --spacing-xl: 1.2rem;
-    }
-
-    .main-container {
-        padding: var(--spacing-md);
     }
 
     .flags-inner-container {
