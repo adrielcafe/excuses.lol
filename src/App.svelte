@@ -1,72 +1,114 @@
 <script lang="ts">
   import { t, locale, json } from 'svelte-i18n';
   import { writable, get } from 'svelte/store';
-  import flagUsUrl from './assets/flag_us.svg';
-  import flagBrUrl from './assets/flag_br.svg';
-  import flagEsUrl from './assets/flag_es.svg';
-  import flagFrUrl from './assets/flag_fr.svg';
-  import flagZhUrl from './assets/flag_zh.svg';
   import reloadIconUrl from './assets/icon_reload.svg';
   import copyIconUrl from './assets/icon_copy.svg';
 
-  declare global {
-    interface Window {
-      gtag?: (...args: any[]) => void;
+  const defaultLocale = 'en';
+  const localeFlags = {
+    en: 'US',
+    pt: 'BR',
+    es: 'ES',
+    fr: 'FR',
+    zh: 'CN',
+  };
+
+  const backgroundColors = [
+    '#F0F8FF',
+    '#FAEBD7',
+    '#F5F5DC',
+    '#FFE4C4',
+    '#FFF8DC',
+    '#FFFACD',
+    '#FAFAD2',
+    '#FFEFD5',
+    '#FFDAB9',
+    '#EEE8AA',
+    '#F5FFFA',
+    '#F0FFF0',
+    '#F0FFFF',
+    '#E6E6FA',
+    '#FFF0F5',
+    '#FFE4E1',
+    '#FFFFF0',
+    '#FDF5E6',
+    '#FAF0E6',
+    '#FFF5EE',
+    '#F8F8FF',
+    '#FFFAF0',
+    '#F5F5F5',
+    '#E0FFFF',
+    '#ADD8E6',
+    '#B0E0E6',
+    '#AFEEEE',
+    '#87CEFA',
+    '#B0C4DE',
+    '#FFB6C1',
+    '#FFA07A',
+    '#EEDD82',
+    '#98FB98',
+    '#90EE90',
+    '#F0E68C',
+    '#D8BFD8',
+    '#DDA0DD',
+    '#C0C0C0',
+    '#D3D3D3',
+    '#E9967A',
+    '#F4A460',
+    '#FFDEAD',
+    '#FFEBCD',
+    '#DEB887',
+    '#BC8F8F',
+    '#F5DEB3',
+    '#FFFFE0',
+    '#FFFDD0',
+    '#F3FFF3',
+    '#F3F3FF',
+    '#F0E6FF',
+    '#FFF5F8',
+    '#FFF0F0',
+    '#EEFFEE',
+    '#F8F0E0',
+    '#F5EBE0',
+    '#F5EDE5',
+    '#F0F0F8',
+    '#F8F5E8',
+    '#E8E8E8',
+    '#D0FFFF',
+    '#BDE0F0',
+    '#C0E8EE',
+    '#BFFEFF',
+  ];
+
+  let currentPhrase = writable('');
+  let showCopyConfirmation = writable(false);
+  let reloadClicked = false;
+
+  function trackAnalytics(event: string) {
+    if (typeof window.gtag === 'function') {
+      try {
+        window.gtag('event', event);
+      } catch (error) {
+        console.error(`Error tracking event: ${event}`, error);
+      }
     }
   }
 
-  const supportedLocales = ['en', 'pt', 'es', 'fr', 'zh'];
-
-  const colors = [
-      '#F5DEB3', // Wheat
-      '#FFB6C1', // LightPink
-      '#FFDAB9', // PeachPuff
-      '#E6E6FA', // Lavender
-      '#FFFACD', // LemonChiffon
-      '#ADD8E6', // LightBlue
-      '#F0E68C', // Khaki
-      '#90EE90', // LightGreen
-      '#D3D3D3', // LightGray
-      '#FFDEAD', // NavajoWhite
-      '#FAEBD7', // AntiqueWhite
-      '#AFEEEE', // PaleTurquoise
-      '#FFE4E1', // MistyRose
-      '#FFF0F5', // LavenderBlush
-      '#F0FFF0', // Honeydew
-      '#F5F5DC', // Beige
-      '#FFF5EE', // SeaShell
-      '#F5FFFA', // MintCream
-      '#E0FFFF', // LightCyan
-      '#F0FFFF', // Azure
-      '#FFEFD5', // PapayaWhip
-      '#FFEBCD', // BlanchedAlmond
-      '#FAF0E6', // Linen
-      '#FFF8DC', // Cornsilk
-      '#B0E0E6', // PowderBlue
-      '#C0C0C0', // Silver
-      '#D8BFD8', // Thistle
-      '#BDB76B'  // DarkKhaki
-    ];
-
-  let currentPhrase = writable('');
-  let currentBgColor = writable('#E6E6FA');
-  let reloadClicked = false;
-  let showCopyConfirmation = writable(false);
-
   function changeLocale(newLocale: string) {
     locale.set(newLocale);
+    trackAnalytics(`click_locale_${newLocale}`);
   }
 
   function initializeLocale() {
     if (typeof navigator !== 'undefined' && navigator.language) {
       const browserLang = navigator.language.split('-')[0];
-      if (supportedLocales.includes(browserLang)) {
+      if (Object.keys(localeFlags).includes(browserLang)) {
         changeLocale(browserLang);
       } else {
-        changeLocale('en');
+        changeLocale(defaultLocale);
       }
     } else {
-      changeLocale('en');
+      changeLocale(defaultLocale);
     }
   }
 
@@ -79,23 +121,12 @@
     let newPhrase = getRandomElement(phrases);
     currentPhrase.set(newPhrase);
 
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'load_new_excuse', {
-        'event_category': 'engagement',
-        'event_label': get(locale).split('-')[0],
-        'value': 1
-      });
-    }
+    document.body.style.backgroundColor = getRandomElement(backgroundColors);
 
-    const newBgColor = getRandomElement(colors);
-    currentBgColor.set(newBgColor);
-
-    if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = newBgColor;
-    }
+    trackAnalytics('click_load_new_excuse');
 
     reloadClicked = true;
-    setTimeout(() => reloadClicked = false, 300);
+    setTimeout(() => (reloadClicked = false), 300);
   }
 
   async function copyToClipboard() {
@@ -124,25 +155,20 @@
 
       textArea.select();
       try {
-         textArea.setSelectionRange(0, 999999);
+        textArea.setSelectionRange(0, 999999);
       } catch (e) {}
-
 
       try {
         success = document.execCommand('copy');
       } catch (err) {
-        console.error('Failed to run document.execCommand(\'copy\'):', err);
+        console.error("Failed to run document.execCommand('copy'):", err);
       } finally {
-         document.body.removeChild(textArea);
+        document.body.removeChild(textArea);
       }
     }
 
-    if (success && typeof window.gtag === 'function') {
-      window.gtag('event', 'copy_excuse', {
-        'event_category': 'engagement',
-        'event_label': textToCopy,
-        'value': 1
-      });
+    if (success) {
+      trackAnalytics('click_copy_excuse');
     }
 
     showCopyConfirmation.set(true);
@@ -153,65 +179,23 @@
 
   locale.subscribe((newLocale) => {
     if (newLocale) {
-        updateContent();
+      updateContent();
     }
   });
 </script>
 
-<main
-  style="background-color: {$currentBgColor};"
-  class="main-container"
-  role="document"
-  aria-live="polite"
->
-  <div class="flags-container">
-    <div class="flags-inner-container">
+<main class="main-container" role="document" aria-live="polite">
+  <div class="flags">
+    {#each Object.entries(localeFlags) as [locale, flag]}
       <img
-        src={flagUsUrl}
-        alt="US Flag"
+        src="https://flagsapi.com/{flag}/shiny/64.png"
+        alt="{flag} flag"
         class="flag-img"
-        aria-label="Change language to English"
         role="button"
         tabindex="0"
-        on:click|stopPropagation={() => changeLocale('en')}
+        on:click|stopPropagation={() => changeLocale(locale)}
       />
-      <img
-        src={flagBrUrl}
-        alt="Brazil Flag"
-        class="flag-img"
-        aria-label="Change language to Portuguese"
-        role="button"
-        tabindex="0"
-        on:click|stopPropagation={() => changeLocale('pt')}
-      />
-      <img
-        src={flagEsUrl}
-        alt="Spain Flag"
-        class="flag-img"
-        aria-label="Change language to Spanish"
-        role="button"
-        tabindex="0"
-        on:click|stopPropagation={() => changeLocale('es')}
-      />
-      <img
-        src={flagFrUrl}
-        alt="France Flag"
-        class="flag-img"
-        aria-label="Change language to French"
-        role="button"
-        tabindex="0"
-        on:click|stopPropagation={() => changeLocale('fr')}
-      />
-      <img
-        src={flagZhUrl}
-        alt="China Flag"
-        class="flag-img"
-        aria-label="Change language to Chinese"
-        role="button"
-        tabindex="0"
-        on:click|stopPropagation={() => changeLocale('zh')}
-      />
-    </div>
+    {/each}
   </div>
 
   <div class="content-container">
@@ -232,7 +216,7 @@
           on:click={copyToClipboard}
           aria-label="Copy excuse to clipboard"
         >
-          <img src={copyIconUrl} alt="Copy" class="icon-svg"/>
+          <img src={copyIconUrl} alt="Copy" class="icon-svg" />
         </button>
         {#if $showCopyConfirmation}
           <span class="copy-confirmation">{$t('copied')}</span>
@@ -246,14 +230,28 @@
   @import url('https://fonts.googleapis.com/css2?family=Gabriela&display=swap');
 
   @keyframes fade-in-out {
-    0% { opacity: 0; transform: translateY(-50%) translateX(-5px); }
-    10% { opacity: 1; transform: translateY(-50%) translateX(0); }
-    90% { opacity: 1; transform: translateY(-50%) translateX(0); }
-    100% { opacity: 0; transform: translateY(-50%) translateX(0); }
+    0% {
+      opacity: 0;
+      transform: translateY(-50%) translateX(-5px);
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-50%) translateX(0);
+    }
   }
 
   @keyframes button-click-animation {
-    50% { transform: scale(0.9); }
+    50% {
+      transform: scale(0.9);
+    }
   }
 
   :root {
@@ -293,17 +291,6 @@
     transition: background-color var(--transition-duration-long);
   }
 
-  .flags-container {
-    width: 100%;
-    margin-top: var(--spacing-sm);
-  }
-
-  .flags-inner-container {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-sm);
-  }
-
   .content-container {
     flex-grow: 1;
     display: flex;
@@ -315,7 +302,7 @@
   .button-container {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xl);
     margin-top: var(--spacing-lg);
   }
 
@@ -333,7 +320,7 @@
     margin-left: var(--spacing-sm);
     background-color: var(--copy-confirm-bg);
     color: var(--copy-confirm-text);
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: var(--spacing-sm);
     border-radius: 4px;
     font-size: var(--font-size-copy-confirm);
     white-space: nowrap;
@@ -356,7 +343,9 @@
     height: var(--icon-button-size);
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color var(--transition-duration), transform var(--transition-duration) ease-out;
+    transition:
+      background-color var(--transition-duration),
+      transform var(--transition-duration) ease-out;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     outline: none;
@@ -394,6 +383,12 @@
     min-height: 215px;
   }
 
+  .flags {
+    padding: var(--spacing-sm) 0;
+    gap: var(--spacing-xs);
+    display: inline-flex;
+  }
+
   .flag-img {
     height: var(--flag-height);
     width: auto;
@@ -401,57 +396,46 @@
     opacity: var(--flag-opacity);
     transition: opacity var(--transition-duration);
     vertical-align: middle;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    outline: none;
   }
 
-  .flag-img:hover {
-    opacity: var(--flag-opacity-hover);
-  }
-
-  @media (max-width: 768px) { /* Tablet and smaller */
+  @media (max-width: 768px) {
+    /* Tablet and smaller */
     :root {
-      --font-size-sorry: 1.5rem;
-      --font-size-phrase: 2rem;
-      --flag-height: 1rem;
+      --font-size-sorry: 2rem;
+      --font-size-phrase: 3rem;
+      --flag-height: 1.7rem;
       --icon-button-size: 48px;
       --spacing-md: 0.6rem;
       --spacing-lg: 0.8rem;
       --spacing-xl: 1.5rem;
     }
-
-    .flags-inner-container {
-      gap: var(--spacing-sm);
-    }
   }
 
-  @media (max-width: 480px) { /* Mobile phones */
+  @media (max-width: 480px) {
+    /* Mobile phones */
     :root {
       --font-size-sorry: 2rem;
       --font-size-phrase: 2.2rem;
-      --flag-height: 1.5rem;
       --spacing-sm: 0.4rem;
       --spacing-md: 0.5rem;
       --spacing-lg: 0.7rem;
       --spacing-xl: 1.2rem;
     }
-    
+
     .phrase-text {
       min-height: 310px;
     }
 
-    .flags-inner-container {
-      gap: var(--spacing-xs);
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
     .button-container {
-        margin-top: var(--spacing-md);
+      margin-top: var(--spacing-md);
     }
 
     .copy-confirmation {
-        font-size: 0.7rem;
-        padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: 0.7rem;
+      padding: var(--spacing-xs) var(--spacing-sm);
     }
   }
-
 </style>

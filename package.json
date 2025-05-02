@@ -8,11 +8,14 @@
     "build": "vite build && cp ads.txt dist/ads.txt",
     "preview": "vite preview",
     "publish": "gh-pages -d dist --cname excuses.lol",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-svelte": "^3.3.3",
     "svelte": "^5.23.1",
     "svelte-check": "^4.1.5",
     "typescript": "~5.7.2",
