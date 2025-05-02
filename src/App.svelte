@@ -100,22 +100,53 @@
 
   async function copyToClipboard() {
     const textToCopy = get(currentPhrase);
-    if (textToCopy && navigator.clipboard) {
+    if (!textToCopy) return;
+
+    let success = false;
+
+    if (navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(textToCopy);
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'copy_excuse', {
-            'event_category': 'engagement',
-            'event_label': textToCopy,
-            'value': 1
-          });
-        }
-        showCopyConfirmation.set(true);
-        setTimeout(() => showCopyConfirmation.set(false), 2000);
+        success = true;
+      } catch (err) {}
+    }
+
+    if (!success) {
+      const textArea = document.createElement('textarea');
+      textArea.value = textToCopy;
+      textArea.setAttribute('readonly', '');
+      textArea.style.position = 'absolute';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      textArea.style.opacity = '0';
+
+      document.body.appendChild(textArea);
+
+      textArea.select();
+      try {
+         textArea.setSelectionRange(0, 999999);
+      } catch (e) {}
+
+
+      try {
+        success = document.execCommand('copy');
       } catch (err) {
-        console.error('Failed to copy text: ', err);
+        console.error('Failed to run document.execCommand(\'copy\'):', err);
+      } finally {
+         document.body.removeChild(textArea);
       }
     }
+
+    if (success && typeof window.gtag === 'function') {
+      window.gtag('event', 'copy_excuse', {
+        'event_category': 'engagement',
+        'event_label': textToCopy,
+        'value': 1
+      });
+    }
+
+    showCopyConfirmation.set(true);
+    setTimeout(() => showCopyConfirmation.set(false), 2000);
   }
 
   initializeLocale();
@@ -193,22 +224,20 @@
         on:click={updateContent}
         aria-label="Load new excuse"
       >
-        <img src={reloadIconUrl} alt="Reload" class="icon-svg" width="24" height="24" />
+        <img src={reloadIconUrl} alt="Reload" class="icon-svg" />
       </button>
-      {#if $currentPhrase}
-        <div class="copy-button-wrapper">
-          <button
-            class="icon-button"
-            on:click={copyToClipboard}
-            aria-label="Copy excuse to clipboard"
-          >
-            <img src={copyIconUrl} alt="Copy" class="icon-svg" width="20" height="20" />
-          </button>
-          {#if $showCopyConfirmation}
-            <span class="copy-confirmation">{$t('copied')}</span>
-          {/if}
-        </div>
-      {/if}
+      <div class="copy-button-wrapper">
+        <button
+          class="icon-button"
+          on:click={copyToClipboard}
+          aria-label="Copy excuse to clipboard"
+        >
+          <img src={copyIconUrl} alt="Copy" class="icon-svg"/>
+        </button>
+        {#if $showCopyConfirmation}
+          <span class="copy-confirmation">{$t('copied')}</span>
+        {/if}
+      </div>
     </div>
   </div>
 </main>
@@ -241,7 +270,7 @@
     --font-size-sorry: 3rem;
     --font-size-phrase: 4rem;
     --font-size-copy-confirm: 0.8rem;
-    --icon-button-size: 40px;
+    --icon-button-size: 64px;
     --flag-height: 2rem;
     --spacing-xs: 0.2rem;
     --spacing-sm: 0.5rem;
@@ -328,10 +357,13 @@
     border-radius: 50%;
     cursor: pointer;
     transition: background-color var(--transition-duration), transform var(--transition-duration) ease-out;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    outline: none;
   }
 
-  .icon-button:hover {
-    background-color: var(--button-hover-bg);
+  .icon-button:focus {
+    outline: none;
   }
 
   .icon-button:active,
@@ -339,7 +371,6 @@
     animation: button-click-animation var(--animation-duration-short) ease-out;
   }
 
-  .icon-button svg,
   .icon-button img.icon-svg {
     display: block;
   }
@@ -360,6 +391,7 @@
     font-weight: 700;
     margin-block: 0 var(--spacing-xl);
     max-width: 90vw;
+    min-height: 215px;
   }
 
   .flag-img {
@@ -380,6 +412,7 @@
       --font-size-sorry: 1.5rem;
       --font-size-phrase: 2rem;
       --flag-height: 1rem;
+      --icon-button-size: 48px;
       --spacing-md: 0.6rem;
       --spacing-lg: 0.8rem;
       --spacing-xl: 1.5rem;
@@ -395,11 +428,14 @@
       --font-size-sorry: 2rem;
       --font-size-phrase: 2.2rem;
       --flag-height: 1.5rem;
-      --icon-button-size: 36px;
       --spacing-sm: 0.4rem;
       --spacing-md: 0.5rem;
       --spacing-lg: 0.7rem;
       --spacing-xl: 1.2rem;
+    }
+    
+    .phrase-text {
+      min-height: 310px;
     }
 
     .flags-inner-container {
