@@ -3,6 +3,7 @@
   import { writable, get } from 'svelte/store';
   import reloadIconUrl from './assets/icon_reload.svg';
   import copyIconUrl from './assets/icon_copy.svg';
+  import logoUrl from './assets/logo.png';
 
   const defaultLocale = 'en';
   const localeFlags = {
@@ -199,7 +200,10 @@
   </div>
 
   <div class="content-container">
-    <p class="sorry-text">{$t('sorry')}</p>
+    <div class="title-container">
+      <img class="logo" alt="Logo" src={logoUrl} />
+      <p class="sorry-text">{$t('sorry')}</p>
+    </div>
     <p class="phrase-text">{$currentPhrase}</p>
     <div class="button-container">
       <button
@@ -281,6 +285,10 @@
     --animation-duration-copy: 2s;
   }
 
+  :global(body) {
+    transition: background-color var(--transition-duration-long);
+  }
+
   .main-container {
     display: flex;
     flex-direction: column;
@@ -288,7 +296,6 @@
     min-height: 100vh;
     color: var(--text-color-dark);
     text-align: center;
-    transition: background-color var(--transition-duration-long);
   }
 
   .content-container {
@@ -364,6 +371,15 @@
     display: block;
   }
 
+  .title-container {
+    display: flex;
+    align-items: end;
+  }
+
+  .logo {
+    height: 120px;
+  }
+
   .sorry-text {
     color: var(--text-color-secondary);
     font-family: var(--font-family-display);
@@ -376,11 +392,11 @@
     color: var(--text-color-primary);
     font-family: var(--font-family-display);
     font-size: var(--font-size-phrase);
-    line-height: 1.1;
+    line-height: 1.2;
     font-weight: 700;
     margin-block: 0 var(--spacing-xl);
     max-width: 90vw;
-    min-height: 215px;
+    min-height: 230px;
   }
 
   .flags {
@@ -402,7 +418,6 @@
   }
 
   @media (max-width: 768px) {
-    /* Tablet and smaller */
     :root {
       --font-size-sorry: 2rem;
       --font-size-phrase: 3rem;
@@ -412,13 +427,16 @@
       --spacing-lg: 0.8rem;
       --spacing-xl: 1.5rem;
     }
+
+    .logo {
+      height: 100px;
+    }
   }
 
   @media (max-width: 480px) {
-    /* Mobile phones */
     :root {
-      --font-size-sorry: 2rem;
-      --font-size-phrase: 2.2rem;
+      --font-size-sorry: 1.8rem;
+      --font-size-phrase: 2rem;
       --spacing-sm: 0.4rem;
       --spacing-md: 0.5rem;
       --spacing-lg: 0.7rem;
@@ -427,15 +445,20 @@
 
     .phrase-text {
       min-height: 310px;
+      margin-bottom: 0;
     }
 
     .button-container {
-      margin-top: var(--spacing-md);
+      margin-top: var(--spacing-xs);
     }
 
     .copy-confirmation {
       font-size: 0.7rem;
       padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .logo {
+      height: 80px;
     }
   }
 </style>
