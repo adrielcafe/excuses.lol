@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build && cp ads.txt dist/ads.txt",
+    "build": "vite build && cp ads.txt dist/ads.txt && cp robots.txt dist/robots.txt",
     "preview": "vite preview",
     "publish": "gh-pages -d dist --cname excuses.lol",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
