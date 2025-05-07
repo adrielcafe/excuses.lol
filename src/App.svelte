@@ -3,7 +3,7 @@
   import { writable, get } from 'svelte/store';
   import reloadIconUrl from './assets/icon_reload.svg';
   import copyIconUrl from './assets/icon_copy.svg';
-  import logoUrl from './assets/logo.png';
+  import logoUrl from './assets/logo.webp';
 
   const defaultLocale = 'en';
   const localeFlags = {
@@ -287,6 +287,7 @@
 
   :global(body) {
     transition: background-color var(--transition-duration-long);
+    margin: 0;
   }
 
   .main-container {
