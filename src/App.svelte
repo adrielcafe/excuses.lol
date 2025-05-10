@@ -5,6 +5,8 @@
   import copyIconUrl from './assets/icon_copy.svg';
   import logoUrl from './assets/logo.webp';
 
+  const gtag = (window as any).gtag;
+
   const defaultLocale = 'en';
   const localeFlags = {
     en: 'US',
@@ -86,9 +88,9 @@
   let reloadClicked = false;
 
   function trackAnalytics(event: string) {
-    if (typeof window.gtag === 'function') {
+    if (typeof gtag === 'function') {
       try {
-        window.gtag('event', event);
+        gtag('event', event);
       } catch (error) {
         console.error(`Error tracking event: ${event}`, error);
       }
@@ -199,6 +201,8 @@
     {/each}
   </div>
 
+  <div id="ezoic-pub-ad-placeholder-101"></div>
+
   <div class="content-container">
     <div class="title-container">
       <img class="logo" alt="Logo" src={logoUrl} />
@@ -229,237 +233,3 @@
     </div>
   </div>
 </main>
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Gabriela&display=swap');
-
-  @keyframes fade-in-out {
-    0% {
-      opacity: 0;
-      transform: translateY(-50%) translateX(-5px);
-    }
-    10% {
-      opacity: 1;
-      transform: translateY(-50%) translateX(0);
-    }
-    90% {
-      opacity: 1;
-      transform: translateY(-50%) translateX(0);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-50%) translateX(0);
-    }
-  }
-
-  @keyframes button-click-animation {
-    50% {
-      transform: scale(0.9);
-    }
-  }
-
-  :root {
-    --text-color-primary: #424242;
-    --text-color-secondary: #616161;
-    --text-color-dark: #000000;
-    --button-border-color: var(--text-color-dark);
-    --button-hover-bg: rgba(0, 0, 0, 0.1);
-    --copy-confirm-bg: rgba(0, 0, 0, 0.7);
-    --copy-confirm-text: white;
-    --flag-opacity: 0.7;
-    --flag-opacity-hover: 1;
-    --font-family-display: 'Gabriela', cursive;
-    --font-size-sorry: 3rem;
-    --font-size-phrase: 4rem;
-    --font-size-copy-confirm: 0.8rem;
-    --icon-button-size: 64px;
-    --flag-height: 2rem;
-    --spacing-xs: 0.2rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 0.8rem;
-    --spacing-lg: 1rem;
-    --spacing-xl: 2rem;
-    --transition-duration: 0.2s;
-    --transition-duration-long: 0.5s;
-    --animation-duration-short: 0.3s;
-    --animation-duration-copy: 2s;
-  }
-
-  :global(body) {
-    transition: background-color var(--transition-duration-long);
-    margin: 0;
-  }
-
-  .main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    color: var(--text-color-dark);
-    text-align: center;
-  }
-
-  .content-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .button-container {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xl);
-    margin-top: var(--spacing-lg);
-  }
-
-  .copy-button-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .copy-confirmation {
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-left: var(--spacing-sm);
-    background-color: var(--copy-confirm-bg);
-    color: var(--copy-confirm-text);
-    padding: var(--spacing-sm);
-    border-radius: 4px;
-    font-size: var(--font-size-copy-confirm);
-    white-space: nowrap;
-    animation: fade-in-out var(--animation-duration-copy) ease-in-out forwards;
-    pointer-events: none;
-  }
-
-  .icon-button {
-    appearance: none;
-    background: none;
-    border: 1px solid var(--button-border-color);
-    padding: 0;
-    margin: 0;
-    font: inherit;
-    color: inherit;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--icon-button-size);
-    height: var(--icon-button-size);
-    border-radius: 50%;
-    cursor: pointer;
-    transition:
-      background-color var(--transition-duration),
-      transform var(--transition-duration) ease-out;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    outline: none;
-  }
-
-  .icon-button:focus {
-    outline: none;
-  }
-
-  .icon-button:active,
-  .icon-button.clicked {
-    animation: button-click-animation var(--animation-duration-short) ease-out;
-  }
-
-  .icon-button img.icon-svg {
-    display: block;
-  }
-
-  .title-container {
-    display: flex;
-    align-items: end;
-  }
-
-  .logo {
-    height: 120px;
-  }
-
-  .sorry-text {
-    color: var(--text-color-secondary);
-    font-family: var(--font-family-display);
-    font-size: var(--font-size-sorry);
-    line-height: 1;
-    margin-block: 0 var(--spacing-sm);
-  }
-
-  .phrase-text {
-    color: var(--text-color-primary);
-    font-family: var(--font-family-display);
-    font-size: var(--font-size-phrase);
-    line-height: 1.2;
-    font-weight: 700;
-    margin-block: 0 var(--spacing-xl);
-    max-width: 90vw;
-    min-height: 230px;
-  }
-
-  .flags {
-    padding: var(--spacing-sm) 0;
-    gap: var(--spacing-xs);
-    display: inline-flex;
-  }
-
-  .flag-img {
-    height: var(--flag-height);
-    width: auto;
-    cursor: pointer;
-    opacity: var(--flag-opacity);
-    transition: opacity var(--transition-duration);
-    vertical-align: middle;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    outline: none;
-  }
-
-  @media (max-width: 768px) {
-    :root {
-      --font-size-sorry: 2rem;
-      --font-size-phrase: 3rem;
-      --flag-height: 1.7rem;
-      --icon-button-size: 48px;
-      --spacing-md: 0.6rem;
-      --spacing-lg: 0.8rem;
-      --spacing-xl: 1.5rem;
-    }
-
-    .logo {
-      height: 100px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    :root {
-      --font-size-sorry: 1.8rem;
-      --font-size-phrase: 2rem;
-      --spacing-sm: 0.4rem;
-      --spacing-md: 0.5rem;
-      --spacing-lg: 0.7rem;
-      --spacing-xl: 1.2rem;
-    }
-
-    .phrase-text {
-      min-height: 310px;
-      margin-bottom: 0;
-    }
-
-    .button-container {
-      margin-top: var(--spacing-xs);
-    }
-
-    .copy-confirmation {
-      font-size: 0.7rem;
-      padding: var(--spacing-xs) var(--spacing-sm);
-    }
-
-    .logo {
-      height: 80px;
-    }
-  }
-</style>

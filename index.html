@@ -61,14 +61,22 @@
       rel="stylesheet"
     />
     <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4970231820354491"
-      crossorigin="anonymous"
+      src="https://cmp.gatekeeperconsent.com/min.js"
+      data-cfasync="false"
+    ></script>
+    <script
+      src="https://the.gatekeeperconsent.com/cmp.min.js"
+      data-cfasync="false"
     ></script>
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-WK7KSKY57P"
     ></script>
+    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+    <script>
+      window.ezstandalone = window.ezstandalone || {};
+      ezstandalone.cmd = ezstandalone.cmd || [];
+    </script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -81,6 +89,11 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      ezstandalone.cmd.push(function () {
+        ezstandalone.showAds(101);
+      });
+    </script>
     <script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
     <script>
       kofiWidgetOverlay.draw('adrielcafe', {
