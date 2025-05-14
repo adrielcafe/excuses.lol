@@ -201,8 +201,6 @@
     {/each}
   </div>
 
-  <div id="ezoic-pub-ad-placeholder-101"></div>
-
   <div class="content-container">
     <div class="title-container">
       <img class="logo" alt="Logo" src={logoUrl} />
